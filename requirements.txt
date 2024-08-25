@@ -10,6 +10,7 @@ idna==3.8
 oauthlib==3.2.2
 pycparser==2.22
 PyJWT==2.9.0
+python-dotenv==1.0.1
 requests==2.32.3
 requests-oauthlib==2.0.0
 sqlparse==0.5.1
