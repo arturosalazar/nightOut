@@ -152,8 +152,10 @@ LOGIN_REDIRECT_URL = '/api'
 LOGOUT_REDIRECT_URL = '/admin'
 
 
-GOOGLE_CLIENT_ID = "815304794917-ds8qg32qhmfpoe3806jb2j63pums1c8i.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+
+GOOGLE_CLIENT_ID = os.getenv('MY_GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('MY_GOOGLE_CLIENT_SECRET')
+
 GOOGLE_REDIRECT_URI = 'http://localhost:8000/api/auth/callback/'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
