@@ -3,3 +3,5 @@ gAuth/__pycache__/
 gAuth/migrations/__pycache__/
 nightOut/__pycache__/
 db.sqlite3
+# .env file
+.env
