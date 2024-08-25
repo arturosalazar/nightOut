@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('api/', include('gAuth.urls')),  # Include aAuth URLs
+    path('api/', include('places.urls')), # Include places URLs
     path('accounts/', include('django.contrib.auth.urls')),
 ]
