@@ -1,3 +1,8 @@
+# Tested using CURL
+# Business Search must be done with POST and needs 'location' and 'business-type' parameters
+# Example: curl -X POST http://localhost:8000/api/search/ -H "Content-Type: application/json" -d '{"location":"Kennebunkport, ME", "business-type":"restaurant"}'
+# Returns JSON with business name, address, rating, phone number, opening hours, and a photo url that can be displayed on front end
+
 import requests
 from django.conf import settings
 from rest_framework.decorators import api_view
