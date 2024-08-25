@@ -2,3 +2,4 @@ venv_nightOut/
 gAuth/__pycache__/
 gAuth/migrations/__pycache__/
 nightOut/__pycache__/
+db.sqlite3
