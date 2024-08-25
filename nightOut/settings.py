@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "gAuth",  # Add your app here
+    'places', # Add places app for search
 ]
 
 MIDDLEWARE = [
