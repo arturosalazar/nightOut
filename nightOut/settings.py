@@ -12,6 +12,14 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+# Added to support loading secret key from .env instead of keeping it in settings.py
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Google Key
+GOOGLE_PLACES_API_KEY = os.getenv('MY_SECRET_KEY')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +51,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "gAuth",  # Add your app here
+    'places', # Add places app for search
 ]
 
 MIDDLEWARE = [
@@ -143,8 +152,10 @@ LOGIN_REDIRECT_URL = '/api'
 LOGOUT_REDIRECT_URL = '/admin'
 
 
-GOOGLE_CLIENT_ID = "815304794917-ds8qg32qhmfpoe3806jb2j63pums1c8i.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+
+GOOGLE_CLIENT_ID = os.getenv('MY_GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('MY_GOOGLE_CLIENT_SECRET')
+
 GOOGLE_REDIRECT_URI = 'http://localhost:8000/api/auth/callback/'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
