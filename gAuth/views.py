@@ -62,4 +62,5 @@ def get_user_details(request):
 @csrf_exempt
 def logout(request):
     auth_logout(request)
+    request.session.flush()  # Ensure session is cleared
     return JsonResponse({'message': 'Successfully logged out.'})
