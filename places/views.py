@@ -7,6 +7,32 @@ import requests
 from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+import math # Imported math for haversine formula to calculate distance from origin to each place
+
+def haversine(lat1, lon1, lat2, lon2):
+    # Radius of the Earth in km
+    R = 6371.0
+    # Convert latitude and longitude from degrees to radians
+    lat1_rad = math.radians(lat1)
+    lon1_rad = math.radians(lon1)
+    lat2_rad = math.radians(lat2)
+    lon2_rad = math.radians(lon2)
+    
+    # Differences in coordinates
+    dlat = lat2_rad - lat1_rad
+    dlon = lon2_rad - lon1_rad
+    
+    # Haversine formula
+    a = math.sin(dlat / 2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    
+    # Distance in km
+    distance_km = R * c
+
+    # Distance in mi
+    distance_miles = distance_km * 0.621371
+
+    return distance_miles
 
 @api_view(['POST'])
 def search_businesses(request):
@@ -28,16 +54,28 @@ def search_businesses(request):
     # Extract top 10 results
     top_results = data.get('results', [])[:10]
 
+    # Get the original search location coordinates from the first result
+    origin_location = top_results[0]['geometry']['location']
+    origin_lat = origin_location['lat']
+    origin_lng = origin_location['lng']
+
     results = []
     for result in top_results:
         place_id = result.get('place_id')
+        # get each place's location coordinates
+        place_location = result.get('geometry', {}).get('location', {})
+        place_lat = place_location.get('lat')
+        place_lng = place_location.get('lng')
+
+        # Calculate distance from the original search location
+        distance = haversine(origin_lat, origin_lng, place_lat, place_lng)
 
         # Perform a Place Details search for each place
         if place_id:
             details_url = "https://maps.googleapis.com/maps/api/place/details/json"
             details_params = {
                 'place_id': place_id,
-                'fields': 'name,formatted_address,rating,formatted_phone_number,opening_hours,photos',
+                'fields': 'name,formatted_address,rating,formatted_phone_number,opening_hours,photos,price_level',
                 'key': settings.GOOGLE_PLACES_API_KEY,
             }
             details_response = requests.get(details_url, params=details_params)
@@ -60,6 +98,8 @@ def search_businesses(request):
                 'phone_number': details_data.get('formatted_phone_number'),
                 'opening_hours': details_data.get('opening_hours', {}).get('weekday_text'),
                 'photo_url': photo_url,  # Include the photo URL
+                'price_level': details_data.get('price_level'),
+                'distance': distance, # Distance in miles
             }
             results.append(result_data)
 
