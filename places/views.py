@@ -117,7 +117,7 @@ def search_businesses(request):
                 'phone_number': details_data.get('formatted_phone_number'),
                 'opening_hours': details_data.get('opening_hours', {}).get('weekday_text'),
                 'photo_url': photo_url,  # Include the photo URL
-                'price_level': details_data.get('price_level'),
+                'price_level': details_data.get('price_level'), # Price level goes from 0 to 4, 0 being free and 4 being most expensive
                 'distance': distance, # Distance in miles
             }
             results.append(result_data)
