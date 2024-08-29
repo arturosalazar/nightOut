@@ -13,6 +13,9 @@ oauth = OAuth2Session(client_id=settings.GOOGLE_CLIENT_ID, redirect_uri=settings
 
 
 def google_login(request):
+    if request.user.is_authenticated:  ## Check if the user is already logged in
+        return redirect('http://localhost:5173/Check')  ## If so, redirect to the appropriate page
+    
     oauth = OAuth2Session(
         settings.GOOGLE_CLIENT_ID,
         redirect_uri=settings.GOOGLE_REDIRECT_URI,
@@ -73,3 +76,10 @@ def logout(request):
     auth_logout(request)
     request.session.flush()  # Ensure session is cleared
     return JsonResponse({'message': 'Successfully logged out.'})
+
+## Check if user is logged in already or not. Will resposnd accordingly
+def check_authentication(request):
+    if request.user.is_authenticated:
+        return JsonResponse({'is_authenticated': True})
+    else:
+        return JsonResponse({'is_authenticated': False})
