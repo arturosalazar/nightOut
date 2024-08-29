@@ -6,6 +6,7 @@ from requests_oauthlib import OAuth2Session
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth.models import User ## Import to use Django built in User model so we can save associated users in our DB
 
 # OAuth2 Client Setup
 oauth = OAuth2Session(client_id=settings.GOOGLE_CLIENT_ID, redirect_uri=settings.GOOGLE_REDIRECT_URI)
@@ -31,7 +32,8 @@ def google_callback(request):
     if not code:
         return JsonResponse({'error': 'Authorization code is missing.'}, status=400)
 
-    oauth.fetch_token(
+    ## Not sure if we need to save token, but added this variable to store result all the same
+    token = oauth.fetch_token(
         'https://accounts.google.com/o/oauth2/token',
         client_secret=settings.GOOGLE_CLIENT_SECRET,
         code=code
@@ -41,13 +43,20 @@ def google_callback(request):
     user_info = response.json()
 
     # Optionally, you can add logic here to create or update the user in the database
+    ## Added logic to create/update user in database
+    user, created = User.objects.get_or_create(
+        email=user_info['email'],
+        defaults={
+            'first_name': user_info.get('given_name', ''),
+            'last_name': user_info.get('family_name', ''),
+            'username': user_info['email'],
+        }
+    )
 
-    return JsonResponse({
-        'first_name': user_info.get('given_name'),
-        'last_name': user_info.get('family_name'),
-        'email': user_info.get('email')
-    })
+    auth_login(request, user) ## Log the user in using DB stored credentials.
+    ## This allows us to store the results without sending JSON to front-end
 
+    return redirect('http://localhost:5173/Check') ## Redirect to desired page after login
 
 @login_required
 @csrf_exempt
