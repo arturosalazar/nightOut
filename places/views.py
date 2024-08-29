@@ -9,6 +9,25 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import math # Imported math for haversine formula to calculate distance from origin to each place
 
+# Retrieve the lat and longitude from a location
+# Needed to retrieve from the user's original search location
+def get_geocode(location):
+    geocode_url = "https://maps.googleapis.com/maps/api/geocode/json"
+    geocode_params = {
+        'address': location,
+        'key': settings.GOOGLE_PLACES_API_KEY,
+    }
+
+    geocode_response = requests.get(geocode_url, params=geocode_params)
+    geocode_data = geocode_response.json()
+
+    if geocode_data['status'] == 'OK':
+        geometry = geocode_data['results'][0]['geometry']['location']
+        return geometry['lat'], geometry['lng']
+    else:
+        return None, None
+
+# Haversine formula - used to calculate distance from origin to each place
 def haversine(lat1, lon1, lat2, lon2):
     # Radius of the Earth in km
     R = 6371.0
@@ -39,6 +58,11 @@ def search_businesses(request):
     location = request.data.get('location')
     business_type = request.data.get('business_type')
 
+    # Get the coordinates of the original search location
+    origin_lat, origin_lng = get_geocode(location)
+    if origin_lat is None or origin_lng is None:
+        return Response({'error': 'Invalid location'}, status=400)
+
     # Google Places API endpoint for text search
     google_places_url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
@@ -53,11 +77,6 @@ def search_businesses(request):
 
     # Extract top 10 results
     top_results = data.get('results', [])[:10]
-
-    # Get the original search location coordinates from the first result
-    origin_location = top_results[0]['geometry']['location']
-    origin_lat = origin_location['lat']
-    origin_lng = origin_location['lng']
 
     results = []
     for result in top_results:
