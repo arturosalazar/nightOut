@@ -5,9 +5,11 @@ nightOut/__pycache__/
 nightOut/places/__pycache__/
 nightOut/places/migrations/__pycache__/
 db.sqlite3
-# .env file
+# .env file containing secret keys
 .env
 places/__init__.py
 places/__pycache__/
 places/migrations/
 db.sqlite3
+.idea/
+events/__pycache__/
